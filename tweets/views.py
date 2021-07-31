@@ -1,12 +1,20 @@
 from django.shortcuts import render
 from django.views import View
 from django.http import HttpResponse
+from .models import *
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 # Create your views here.
 
 class AllTweets(View):
+
+    @method_decorator(login_required(login_url='/'))
     def get(self, request, *args, **kwargs):
-        return HttpResponse('This is the page where we can see all of the Tweets.')
+        tweets = Tweet.objects.all()
+
+        return render(request, template_name="tweets/all-tweets.html", context={'tweets':tweets})
     
+    @method_decorator(login_required(login_url='/'))
     def post(self, request, *args, **kwargs):
         pass
