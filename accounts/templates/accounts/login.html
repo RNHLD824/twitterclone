@@ -116,6 +116,10 @@ Twitter Clone | Login
                 {% endfor %}
 
                 <p class="text-center">
+                  <a href="{% url 'reset_password' %}" style="text-decoration: none;">Forgot your password?</a>
+                </p>
+
+                <p class="text-center">
                   Don't have an account yet?
                   <a
                     href="{% url 'register' %}"

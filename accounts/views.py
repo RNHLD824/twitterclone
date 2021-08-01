@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.http import HttpResponse
 
-from .forms import CreateUserForm
+from .forms import CreateUserForm, ProfileForm
+from .models import Profile as ProfileModel
 from .models import *
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -56,7 +57,7 @@ class Register(View):
             username = form.cleaned_data['username']
             email = form.cleaned_data['email']
 
-            profile = Profile(user=user, first_name=first_name, last_name=last_name, username=username, email=email)
+            profile = ProfileModel(user=user, first_name=first_name, last_name=last_name, username=username, email=email)
             profile.save()
 
             return redirect('/registration-success')
@@ -70,4 +71,42 @@ class RegistrationSuccess(View):
     def get(self, request, *args, **kwargs):
         return render(request, template_name='accounts/registration-success.html', context={})
 
+class Profile(View):
+    @method_decorator(login_required(login_url='/'))
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        profile = ProfileModel.objects.get(user=user)
+
+        form = ProfileForm(instance=profile)
+        return render(request, template_name="accounts/profile.html", context={'form':form})
+    
+    @method_decorator(login_required(login_url='/'))
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        user_instance = ProfileModel.objects.get(user=user)
+        account_instance = User.objects.get(id=user.id)
+
+        form = ProfileForm(request.POST, request.FILES, instance=user_instance)
+
+        if form.is_valid():
+            form.save()
+
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+
+            account_instance.first_name = first_name
+            account_instance.last_name = last_name
+            account_instance.username = username
+            account_instance.email = email
+
+            account_instance.save()
+
+            return render(request, template_name="accounts/profile.html", context={'form':form})
+
+        else:
+            messages.error(request, 'There was an error')
+
+        return render(request, template_name="accounts/profile.html", context={'form':form})
 
