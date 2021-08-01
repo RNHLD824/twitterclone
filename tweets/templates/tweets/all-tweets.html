@@ -47,7 +47,8 @@ Clone | Tweets {% endblock %} {% block content %}
         <!-- End Name Header -->
       </div>
       <div class="card-body">
-        <form>
+        <form method="POST">
+          {% csrf_token %}
           <div class="form-group">
             <!-- Tweet -->
             <textarea
@@ -115,10 +116,11 @@ Clone | Tweets {% endblock %} {% block content %}
           </p>
           <br />
           <!-- User only -->
+          {% if tweet.user.id == user.profile.id %}
           <div class="pull-right row row-cols-auto">
             <div class="col">
               <!-- Edit -->
-              <a href="#" style="background: none; border: none;">
+              <a href="/tweets/edit-tweet/{{ tweet.id }}" style="background: none; border: none;">
                 <i
                   class="iconBtn fa fa-pencil-square-o fa-3"
                   aria-hidden="true"
@@ -128,20 +130,21 @@ Clone | Tweets {% endblock %} {% block content %}
             </div>
             <div class="col">
               <!-- Delete -->
-              <form>
-                <button
-                  type="submit"
-                  style="background: none; border: none;"
-                >
-                  <i
-                    class="iconBtn fa fa-trash-o fa-3"
-                    aria-hidden="true"
-                  ></i>
+              <form method="POST" action="{% url 'delete-tweet' tweet.id %}">
+                {% csrf_token %}
+                <button type="submit" value="{{ tweet.id }}" style="background: none; border: none;">
+                  <i class="iconBtn fa fa-trash-o fa-3" aria-hidden="true"></i>
                 </button>
               </form>
               <!-- End Delete -->
             </div>
           </div>
+
+          {% else %}
+          <br>
+
+          {% endif %}
+
           <!-- End User only -->
         </div>
       </div>
