@@ -90,7 +90,7 @@ WSGI_APPLICATION = 'twitterclone.wsgi.application'
 #     }
 # }
 
-DATABASE = {
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': config('DB_NAME'),
